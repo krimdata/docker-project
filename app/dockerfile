@@ -1,8 +1,8 @@
 # Image de base Python
 FROM python:3.10-slim
 
-# Mettre à jour les paquets et installer nc (Netcat)
-RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
+# Mettre à jour les paquets et installer netcat-openbsd
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -19,3 +19,4 @@ RUN chmod +x /app/wait-for-it.sh
 
 # Lancer l'application avec wait-for-it.sh pour attendre que MySQL soit prêt
 CMD ["/app/wait-for-it.sh", "mysql-db:3306", "--", "python", "app.py"]
+
