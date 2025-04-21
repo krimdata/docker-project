@@ -1,7 +1,7 @@
 # Image de base Python
 FROM python:3.10-slim
 
-# Définir le répertoire de travail
+# Définir le répertoire de travail .......
 WORKDIR /app
 
 # Copier et installer les dépendances
