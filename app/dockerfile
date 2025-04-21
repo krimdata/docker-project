@@ -1,6 +1,9 @@
 # Image de base Python
 FROM python:3.10-slim
 
+# Mettre à jour les paquets et installer nc (Netcat)
+RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
+
 # Définir le répertoire de travail
 WORKDIR /app
 
