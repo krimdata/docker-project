@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Définir le répertoire de travail
-WORKDIR /app
+WORKDIR /APP
 
 # Copier et installer les dépendances
 COPY requirements.txt .
