@@ -9,7 +9,7 @@ RUN apt-get update \
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier et installer les dépendances Python
+# Copier et installer les dépendances Python ......
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
