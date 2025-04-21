@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
@@ -26,7 +27,8 @@ jobs:
       - name: Run vulnerability scan
         run: sh security/test-vulns.sh
 
-      - name: Push image to Docker Hub
+      - name: Tag and Push image to Docker Hub
         run: |
-          docker tag myapp:latest ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+          IMAGE_ID=$(docker compose images -q flask-public)
+          docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
