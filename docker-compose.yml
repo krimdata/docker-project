@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
+          cpus: '0.50'
+          memory: 256M
+
+  flask-app:
+    build: ./app
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=testdb
+    depends_on:
+      - mysql-db
+    networks:
+      - app-net
+    deploy:
+      mode: replicated
+      replicas: 3
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  flask-public:
+    build: ./app
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=testdb
+    depends_on:
+      - mysql-db
+    networks:
+      - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  db_data:
+
+networks:
+  app-net:
