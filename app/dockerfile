@@ -1,16 +1,18 @@
 # Image de base Python
 FROM python:3.10-slim
 
-# Définir le répertoire de travail .......
+# Définir le répertoire de travail
 WORKDIR /app
 
 # Copier et installer les dépendances
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code source
+# Copier le code source et le script d'attente
 COPY . .
 
-# Lancer l'application
-#CMD ["python", "app.py"]
-CMD ["./wait-for-it.sh", "mysql-db:3306", "--", "python", "app.py"]
+# Assurer que le script wait-for-it.sh est exécutable
+RUN chmod +x /app/wait-for-it.sh
+
+# Lancer l'application avec wait-for-it.sh pour attendre que MySQL soit prêt
+CMD ["/app/wait-for-it.sh", "mysql-db:3306", "--", "python", "app.py"]
