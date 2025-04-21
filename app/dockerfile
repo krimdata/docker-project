@@ -1,22 +1,22 @@
-# Image de base Python
+# Image de base Python légère
 FROM python:3.10-slim
 
-# Mettre à jour les paquets et installer netcat-openbsd
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+# Installer curl pour les healthchecks internes
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier et installer les dépendances
+# Copier et installer les dépendances Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code source et le script d'attente
+# Copier le code source de l'application
 COPY . .
 
-# Assurer que le script wait-for-it.sh est exécutable
-RUN chmod +x /app/wait-for-it.sh
+# Démarrer l'application Flask
+CMD ["python", "app.py"]
 
-# Lancer l'application avec wait-for-it.sh pour attendre que MySQL soit prêt
-CMD ["/app/wait-for-it.sh", "mysql-db:3306", "--", "python", "app.py"]
 

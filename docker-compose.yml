@@ -19,6 +19,11 @@ services:
         reservations:
           cpus: '0.50'
           memory: 256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   flask-app:
     build: ./app
@@ -28,9 +33,15 @@ services:
       - DB_PASSWORD=root
       - DB_NAME=testdb
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
     networks:
       - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/clients"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       mode: replicated
       replicas: 3
@@ -52,20 +63,31 @@ services:
       - DB_PASSWORD=root
       - DB_NAME=testdb
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
     networks:
       - app-net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/clients"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  smoke-test:
+    image: curlimages/curl
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      flask-public:
+        condition: service_healthy
+    entrypoint: ["sh", "-c"]
+    command: ["curl -f http://flask-public:5000/clients"]
+    networks:
+      - app-net
 
 volumes:
   db_data:
 
 networks:
   app-net:
+

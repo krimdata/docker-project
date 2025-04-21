@@ -7,7 +7,6 @@ on:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -20,11 +19,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and run containers with resource limits
-        run: docker compose up --build --exit-code-from flask-app
-
-      - name: Wait for MySQL to be ready
-        run: ./wait-for-it.sh mysql-db:3306 --timeout=60 --strict -- echo "MySQL is ready"
+      - name: Build & smoke-test
+        run: |
+          docker compose up --build --abort-on-container-exit --exit-code-from smoke-test
 
       - name: Run vulnerability scan
         run: sh security/test-vulns.sh
